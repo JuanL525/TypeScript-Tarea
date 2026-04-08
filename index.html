@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Notas - EPN</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .calculator {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #1a1a2e;
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            text-align: center;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            outline: none;
+        }
+
+        .input-group input:focus {
+            border-color: #4361ee;
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.2);
+        }
+
+        .result {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 25px;
+            text-align: center;
+        }
+
+        .sum {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .sum span {
+            font-weight: 700;
+            color: #4361ee;
+            font-size: 1.6rem;
+        }
+
+        .status {
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .status.aprobado {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.reprobado {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status.supletorio {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .message {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1rem;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.supletorio {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .message.reprobado-directo {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        @media (max-width: 480px) {
+            .calculator {
+                padding: 25px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .status {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="header">
+            <h1>Calculadora de Notas EPN</h1>
+            <p>Ingresa tus calificaciones por bimestre</p>
+        </div>
+
+        <div class="input-group">
+            <label for="bimestre1">Bimestre 1 (0 - 20)</label>
+            <input type="number" id="bimestre1" min="0" max="20" step="0.1" placeholder="0">
+        </div>
+
+        <div class="input-group">
+            <label for="bimestre2">Bimestre 2 (0 - 20)</label>
+            <input type="number" id="bimestre2" min="0" max="20" step="0.1" placeholder="0">
+        </div>
+
+        <div class="result">
+            <div class="sum">Suma Total: <span id="suma">0</span>/40</div>
+            <div id="status" class="status">Estado: ---</div>
+            <div id="message" class="message"></div>
+        </div>
+    </div>
+
+    <script>
+        const bimestre1Input = document.getElementById('bimestre1');
+        const bimestre2Input = document.getElementById('bimestre2');
+        const sumaDisplay = document.getElementById('suma');
+        const statusDisplay = document.getElementById('status');
+        const messageDisplay = document.getElementById('message');
+
+        function calculate() {
+            const b1 = parseFloat(bimestre1Input.value) || 0;
+            const b2 = parseFloat(bimestre2Input.value) || 0;
+            const suma = b1 + b2;
+
+            sumaDisplay.textContent = suma.toFixed(1);
+
+            statusDisplay.classList.remove('aprobado', 'reprobado', 'supletorio');
+            messageDisplay.classList.remove('show', 'supletorio', 'reprobado-directo');
+
+            if (suma >= 28) {
+                statusDisplay.textContent = 'Estado: APROBADO';
+                statusDisplay.classList.add('aprobado');
+            } else if (suma < 18) {
+                statusDisplay.textContent = 'Estado: REPROBADO DIRECTO';
+                statusDisplay.classList.add('reprobado');
+                messageDisplay.textContent = 'Perdiste la materia directamente.';
+                messageDisplay.classList.add('show', 'reprobado-directo');
+            } else {
+                const notaRequerida = 48 - suma;
+                statusDisplay.textContent = 'Estado: SUPLETORIO';
+                statusDisplay.classList.add('supletorio');
+                messageDisplay.textContent = `Necesitas sacar ${notaRequerida.toFixed(1)}/40 en el examen de supletorio para aprobar.`;
+                messageDisplay.classList.add('show', 'supletorio');
+            }
+        }
+
+        bimestre1Input.addEventListener('input', calculate);
+        bimestre2Input.addEventListener('input', calculate);
+    </script>
+</body>
+</html>
